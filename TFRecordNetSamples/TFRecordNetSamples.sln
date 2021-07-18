@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TFRecordNetTutorial", "TFRecordNetTutorial\TFRecordNetTutorial.csproj", "{10720E19-65AD-4D4F-9B5A-6EF70541DDCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HelloGrpc", "HelloGrpc\HelloGrpc.csproj", "{979EEB0D-F02E-4449-AC00-F0ED8E3367D4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10720E19-65AD-4D4F-9B5A-6EF70541DDCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10720E19-65AD-4D4F-9B5A-6EF70541DDCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10720E19-65AD-4D4F-9B5A-6EF70541DDCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10720E19-65AD-4D4F-9B5A-6EF70541DDCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{979EEB0D-F02E-4449-AC00-F0ED8E3367D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{979EEB0D-F02E-4449-AC00-F0ED8E3367D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{979EEB0D-F02E-4449-AC00-F0ED8E3367D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{979EEB0D-F02E-4449-AC00-F0ED8E3367D4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
