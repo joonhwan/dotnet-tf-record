@@ -7,19 +7,21 @@ namespace TFRecordNetTutorial
     {
         public DataDirectoryResolver()
         {
-            var baseDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var dataRootDirectory = baseDirectory;
+            var currentProjectDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var solutionDirectory = currentProjectDirectory;
+            var rootDirectory = solutionDirectory;
             var binSubPath = $"bin{Path.DirectorySeparatorChar}";
-            var binSubPathIndex = baseDirectory.IndexOf(binSubPath); 
+            var binSubPathIndex = currentProjectDirectory.IndexOf(binSubPath); 
             if (binSubPathIndex >= 0)
             {
-                baseDirectory = baseDirectory.Substring(0, binSubPathIndex).TrimEnd(Path.DirectorySeparatorChar);
-                dataRootDirectory = Directory.GetParent(baseDirectory).FullName; 
+                currentProjectDirectory = currentProjectDirectory.Substring(0, binSubPathIndex).TrimEnd(Path.DirectorySeparatorChar);
+                solutionDirectory = Directory.GetParent(currentProjectDirectory).FullName;
+                rootDirectory = Directory.GetParent(solutionDirectory).FullName;
             }
             // var cwd = Environment.CurrentDirectory;
             // Console.WriteLine("CurrentDirectory : {0}, SourcePath : {1}",  cwd, sourcePath);
-            ProjectRoot = baseDirectory;
-            DataBaseDirectory = Path.Combine(dataRootDirectory, "data");
+            ProjectRoot = currentProjectDirectory;
+            DataBaseDirectory = Path.Combine(rootDirectory, "data");
         }
 
         public string DataBaseDirectory { get; set; }
