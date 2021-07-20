@@ -20,11 +20,11 @@ def _parse_function(example_proto):
   return tf.io.parse_single_example(example_proto, feature_description)
 
 
-ds = tf.data.TFRecordDataset(tfrecord_path)
+ds = tf.data.TFRecordDataset(tfrecord_path)#, compression_type="GZIP")
 ds = ds.map(_parse_function)
 
 read_check_dir = Path("./.datasets/marble")
-for example in ds:
+for example in ds.take(5):
     name = example['name'].numpy() # --> bytes
     name = name.decode('utf-8') #  --> string(utf-8)
     name = Path(name).name
@@ -40,4 +40,14 @@ for example in ds:
 
 
 #%%
- 
+tfrecord_path = data_dir / 'data/marble.tfrecord.gz'
+ds = tf.data.TFRecordDataset(tfrecord_path, compression_type='GZIP')
+ds = ds.map(_parse_function)
+for example in ds.take(5):
+  name = example['name']
+  imageFile = example['imageFile']
+  label = example['label']
+
+  print(f'{name} : {len(imageFileBytes)} bytes, label={label}')
+  img = tf.io.decode_jpeg(imageFile)
+  print(img)

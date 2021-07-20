@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Mime;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using Tensorflow.Models;
@@ -12,39 +14,129 @@ namespace TFRecordNetTutorial
         static void Main(string[] args)
         {
             //RunDemo1();
-            RunDemo2();
+            RunDemo2(gzip: true);
+            RunDemo3();
         }
 
-        static void RunDemo2()
+        private static void RunDemo3(bool gzip = true)
+        {
+                        var ddr = new DataDirectoryResolver();
+            var trainImagesDirectory = ddr.GetDataDirectory("marble");
+            Console.WriteLine("TrainImagesDirectory : {0}", trainImagesDirectory);
+
+            var path = Path.Combine(ddr.DataBaseDirectory, "marble.tfrecord");
+            if (gzip)
+            {
+                path += ".gz";
+            }
+
+            GZipStream gzipStream = null;
+            var fileStream = File.Create(path);
+            try
+            {
+                Stream outStream = null;
+                if (gzip)
+                {
+                    gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
+                    outStream = gzipStream;
+                }
+                else
+                {
+                    outStream = fileStream;
+                }
+
+                var writer = new TFRecordWriter(outStream);
+                var imageFilePaths = Directory.EnumerateFiles(trainImagesDirectory, "*.*", SearchOption.AllDirectories);
+                ;
+                foreach (var imageFilePath in imageFilePaths.Where(IsImageFile))
+                {
+                    Console.WriteLine($"Importing {imageFilePath}...");
+                    var dirName = new DirectoryInfo(Path.GetDirectoryName(imageFilePath)).Name;
+                    var example = new Example()
+                    {
+                        Features = new Features
+                        {
+                            Feature =
+                            {
+                                ["name"] = Feature.FromString(imageFilePath),
+                                ["imageFile"] = Feature.FromFile(imageFilePath),
+                                ["label"] = Feature.FromString(dirName)
+                            }
+                        }
+                    };
+                    writer.Write(example.ToByteArray());
+                }
+            }
+            finally
+            {
+                gzipStream?.Dispose();
+                fileStream?.Dispose();
+            }
+        }
+
+        static void RunDemo2(bool gzip = false)
         {
             var ddr = new DataDirectoryResolver();
             var trainImagesDirectory = ddr.GetDataDirectory("marble");
             Console.WriteLine("TrainImagesDirectory : {0}", trainImagesDirectory);
 
             var path = Path.Combine(ddr.DataBaseDirectory, "marble.tfrecord");
-            using var outFile = File.Create(path);
-            var writer = new TFRecordWriter(outFile);
-            var imageFilePaths = Directory.EnumerateFiles(trainImagesDirectory, "*.*", SearchOption.AllDirectories);;
-            foreach (var imageFilePath in imageFilePaths)
+            if (gzip)
             {
-                Console.WriteLine($"Importing {imageFilePath}...");
-                var dirName = new DirectoryInfo(Path.GetDirectoryName(imageFilePath)).Name;
-                var example = new Example()
+                path += ".gz";
+            }
+
+            GZipStream gzipStream = null;
+            var fileStream = File.Create(path);
+            try
+            {
+                Stream outStream = null;
+                if (gzip)
                 {
-                    Features = new Features
+                    gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal);
+                    outStream = gzipStream;
+                }
+                else
+                {
+                    outStream = fileStream;
+                }
+
+                var writer = new TFRecordWriter(outStream);
+                var imageFilePaths = Directory.EnumerateFiles(trainImagesDirectory, "*.*", SearchOption.AllDirectories);
+                ;
+                foreach (var imageFilePath in imageFilePaths.Where(IsImageFile))
+                {
+                    Console.WriteLine($"Importing {imageFilePath}...");
+                    var dirName = new DirectoryInfo(Path.GetDirectoryName(imageFilePath)).Name;
+                    var example = new Example()
                     {
-                        Feature =
+                        Features = new Features
                         {
-                            ["name"] = Feature.FromString(imageFilePath),
-                            ["imageFile"] = Feature.FromFile(imageFilePath),
-                            ["label"] = Feature.FromString(dirName)
+                            Feature =
+                            {
+                                ["name"] = Feature.FromString(imageFilePath),
+                                ["imageFile"] = Feature.FromFile(imageFilePath),
+                                ["label"] = Feature.FromString(dirName)
+                            }
                         }
-                    }
-                };
-                writer.Write(example.ToByteArray());
+                    };
+                    writer.Write(example.ToByteArray());
+                }
+            }
+            finally
+            {
+                gzipStream?.Dispose();
+                fileStream?.Dispose();
             }
         }
-        
+
+        private static readonly string[] imageFileExtensions = {".jpg", ".gif", ".png", ".bmp"};
+        private static bool IsImageFile(string path)
+        {
+            var ext = Path.GetExtension(path).ToLower();
+            return imageFileExtensions.Contains(ext);
+        }
+
         static void RunDemo1()
         {
             var ddr = new DataDirectoryResolver();
